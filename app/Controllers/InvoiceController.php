@@ -10,13 +10,8 @@ use Twig\Environment;
 class InvoiceController
 {
     public function __construct(private Environment $twig){}
-    #[Get('/test')]
-    public function test(): string
-    {
-        return "Test";
-    }
 
-    #[Get('/invoices')]
+    #[Get('/test')]
     public function index(): string
     {
         // $invoices = Invoice::query()
@@ -52,7 +47,6 @@ class InvoiceController
                 'dueDate' => '2021-10-10 10:10:10',
             ],
         ];
-        return "WTF";
-        // return $this->twig->render('invoices/index.twig', compact('invoices'));
+        return $this->twig->render('invoices/index.twig', compact('invoices'));
     }
 }
