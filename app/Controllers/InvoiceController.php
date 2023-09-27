@@ -19,7 +19,7 @@ class InvoiceController
     }
 
     #[Get('/invoices')]
-    public function invoices(): string
+    public function index(): string
     {
         $invoices = Invoice::query()
             ->where('status', InvoiceStatus::Paid)
@@ -32,6 +32,7 @@ class InvoiceController
                 'dueDate' => $invoice->due_date->toDateTimeString(),
             ])->toArray();
             ;
-        return $this->twig->render('invoices/index.twig', compact('invoices'));
+            return "Invoices";
+        // return $this->twig->render('invoices/index.twig', compact('invoices'));
     }
 }
