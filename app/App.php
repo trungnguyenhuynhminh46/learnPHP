@@ -1,0 +1,59 @@
+<?php
+declare(strict_types=1);
+
+namespace App;
+
+use App\Exceptions\RouteNotFoundException;
+use Dotenv\Dotenv;
+use Illuminate\Container\Container;
+use Illuminate\Database\Capsule\Manager as Capsule;
+use Illuminate\Events\Dispatcher;
+use Twig\Environment;
+use Twig\Loader\FilesystemLoader;
+use Twig\Extra\Intl\IntlExtension;
+
+class App {
+    private Config $config;
+
+    public function __construct(
+        protected Container $container, 
+        protected ?Router $router = null, 
+        protected array $request = []) {}
+
+    public function initDb(array $config) {
+        $capsule = new Capsule;
+
+        $capsule->addConnection($config);
+        $capsule->setEventDispatcher(new Dispatcher());
+        $capsule->setAsGlobal();
+        $capsule->bootEloquent();
+    }
+
+    public function boot(): self {
+        (Dotenv::createImmutable(ROOT_DIR))->load();
+        $this->config = new Config($_ENV);
+        
+        $this->initDb($this->config->db);
+
+        $loader = new FilesystemLoader(VIEWS_DIR);
+        $twig = new Environment($loader, [
+            'cache' => STORAGE_DIR . '/cache',
+            'auto_reload' => true,
+        ]);
+        $twig->addExtension(new IntlExtension());
+
+        $this->container->singleton(Environment::class, fn()=>$twig);
+        
+        return $this;
+    }
+
+    public function run() {
+        try{
+            echo $this->router->resolve($this->request['method'], $this->request['uri']);
+        }catch(RouteNotFoundException){
+            http_response_code(404);
+            echo View::make('error/404');
+        }
+    }
+}
+?>
