@@ -17,9 +17,9 @@ class InvoiceController
     {
         return "Test";
     }
-    
+
     #[Get('/invoices')]
-    public function index(): string
+    public function invoices(): string
     {
         $invoices = Invoice::query()
             ->where('status', InvoiceStatus::Paid)
