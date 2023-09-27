@@ -31,8 +31,6 @@ class InvoiceController
                 'status' => $invoice->status->value,
                 'dueDate' => $invoice->due_date->toDateTimeString(),
             ])->toArray();
-            
-        return "Invoices";
-        // return $this->twig->render('invoices/index.twig', compact('invoices'));
+        return $this->twig->render('invoices/index.twig', compact('invoices'));
     }
 }

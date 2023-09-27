@@ -1,3 +1,5 @@
 *.txt
 vendor
 storage
+*.env
+.env
