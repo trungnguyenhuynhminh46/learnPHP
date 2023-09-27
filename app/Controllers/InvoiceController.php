@@ -12,6 +12,12 @@ use Twig\Environment;
 class InvoiceController
 {
     public function __construct(private Environment $twig){}
+    #[Get('/test')]
+    public function test(): string
+    {
+        return "Test";
+    }
+    
     #[Get('/invoices')]
     public function index(): string
     {
