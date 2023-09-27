@@ -52,6 +52,7 @@ class InvoiceController
                 'dueDate' => '2021-10-10 10:10:10',
             ],
         ];
-        return $this->twig->render('invoices/index.twig', compact('invoices'));
+        return "WTF";
+        // return $this->twig->render('invoices/index.twig', compact('invoices'));
     }
 }
