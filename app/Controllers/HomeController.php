@@ -2,46 +2,14 @@
 declare(strict_types=1);
 
 namespace App\Controllers;
-
-use App\Attributes\Route;
-use App\Attributes\Get;
-use App\Attributes\Post;
-use App\Attributes\Put;
-use App\Attributes\Delete;
-use App\Enums\HttpMethod;
-use App\View;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
+use Slim\Views\Twig;
 
 class HomeController {
-    public function __construct(){}
-
-    #[Get('/')]
-    public function index() {
-        return View::make('index');
-    }
-
-    #[Route('/normal', "GET")]
-    public function normal() {
-        return 'normal';
-    }
-
-    #[Get('/get')]
-    public function get() {
-        return 'get';
-    }
-
-    #[Post('/post')]
-    public function post() {
-        return 'post';
-    }
-
-    #[Put('/put')]
-    public function put() {
-        return 'put';
-    }
-
-    #[Delete('/delete')]
-    public function delete() {
-        return 'delete';
+    public function index(Request $request, Response $response, $args) {
+        $view = Twig::fromRequest($request);
+        return $view->render($response, 'index.twig');
     }
 }
 ?>

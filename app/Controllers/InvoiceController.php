@@ -4,28 +4,18 @@ declare(strict_types = 1);
 
 namespace App\Controllers;
 
-use App\Attributes\Get;
 use App\Enums\InvoiceStatus;
-use App\Models\Invoice;
-use Twig\Environment;
+use App\Services\InvoiceService;
+use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Http\Message\ResponseInterface as Response;
+use Slim\Views\Twig;
 
 class InvoiceController
 {
-    public function __construct(private Environment $twig){}
-
-    #[Get('/test')]
-    public function index(): string
-    {
-        $invoices = Invoice::query()
-            ->where('status', InvoiceStatus::Paid)
-            ->get()
-            ->map(fn(Invoice $invoice)=>[
-                'id' => $invoice->id,
-                'invoiceNumber' => $invoice->invoice_number,
-                'amount' => $invoice->amount,
-                'status' => $invoice->status->value,
-                'dueDate' => $invoice->due_date->toDateTimeString(),
-            ])->toArray();
-        return $this->twig->render('invoices/index.twig', compact('invoices'));
+    public function __construct(private InvoiceService $invoiceService) {}
+    public function view(Request $request, Response $response, $args) {
+        $view = Twig::fromRequest($request);
+        $invoices = $this->invoiceService->getInvoices(InvoiceStatus::Paid);
+        return $view->render($response, 'invoices/index.twig', compact('invoices'));
     }
 }

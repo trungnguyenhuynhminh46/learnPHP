@@ -9,23 +9,47 @@ define('VIEWS_DIR', ROOT_DIR . '/views');
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once APP_DIR . '/helpers/index.php';
 
-use App\App;
-use App\Router;
+use Slim\Factory\AppFactory;
 use App\Controllers\HomeController;
 use App\Controllers\InvoiceController;
-use Illuminate\Container\Container;
+use Slim\Views\Twig;
+use Slim\Views\TwigMiddleware;
+use Twig\Extra\Intl\IntlExtension;
+use DI\Container;
+use Doctrine\ORM\EntityManager;
+use App\Config;
+use Doctrine\ORM\ORMSetup;
+use Doctrine\DBAL\DriverManager;
+use function DI\create;
 
+require __DIR__ . '/../vendor/autoload.php';
+
+// ==== NOTE khúc này
+(Dotenv\Dotenv::createImmutable(ROOT_DIR))->safeLoad();
 $container = new Container();
-$router = new Router($container);
+$container->set(Config::class, create(Config::class)->constructor($_ENV));
+$container->set(EntityManager::class, function (Config $config) {
+    $paths = [APP_DIR . '/Entities'];
+    $isDevMode = false;
+    $dbParams = $config->db;
 
-$router->registerRoutesThroughAttributes([
-    HomeController::class,
-    InvoiceController::class,
+    $config = ORMSetup::createAttributeMetadataConfiguration($paths, $isDevMode);
+    $connection = DriverManager::getConnection($dbParams, $config);
+    $entityManager = new EntityManager($connection, $config);
+    return $entityManager;
+});
+// ====
+AppFactory::setContainer($container);
+$app = AppFactory::create();
+$twig = Twig::create(VIEWS_DIR, [
+    'cache' => STORAGE_DIR.'/cache',
+    'auto_reload' => true
 ]);
-$request = [
-    'uri' => $_SERVER['REQUEST_URI'],
-    'method' => $_SERVER['REQUEST_METHOD'],
-];
+$twig->addExtension(new IntlExtension);
+$app->add(TwigMiddleware::create($app, $twig));
 
-(new App($container, $router, $request))->boot()->run();
+$app->get('/', [HomeController::class, 'index']);
+$app->get('/invoices', [InvoiceController::class, 'view']);
+
+$app->run();
 ?>

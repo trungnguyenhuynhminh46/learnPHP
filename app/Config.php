@@ -8,14 +8,11 @@ class Config {
     public function __construct(array $env) {
         $this->config = [
             'db' => [
-                'driver' => $env['DB_DRIVER'] ?? 'mysql',
                 'host' => $env['DB_HOST'],
-                'database' => $env['DB_DATABASE'],
-                'username' => $env['DB_USERNAME'],
+                'user' => $env['DB_USERNAME'],
                 'password' => $env['DB_PASSWORD'],
-                'charset' => 'utf8',
-                'collation' => 'utf8_unicode_ci',
-                'prefix' => '',
+                'driver' => $env['DB_DRIVER'] ?? 'pdo_mysql',
+                'dbname' => $env['DB_DATABASE']
             ],
             'mailer' => [
                 'dsn' => $env['MAILER_DSN'],

@@ -34,8 +34,8 @@ class Invoice {
     #[Column(name: 'created_at')]
     private DateTime $createdAt;
 
-    #[Column(name: 'due_at')]
-    private DateTime $dueAt;
+    #[Column(name: 'due_date')]
+    private DateTime $dueDate;
 
     #[OneToMany(mappedBy: 'invoice', targetEntity: InvoiceItem::class, cascade: ['persist', 'remove'])]
     private Collection $invoiceItems;
@@ -98,9 +98,9 @@ class Invoice {
         return $this;
     }
 
-    public function getDueAt()
+    public function getDueDate()
     {
-        return $this->dueAt;
+        return $this->dueDate;
     }
 
     public function setDueAt($dueAt): self
